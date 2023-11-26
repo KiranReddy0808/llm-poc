@@ -40,7 +40,7 @@ def query_search(search: SearchBody):
                 if product.payload['index'] in product_ids:
                     product_scores[product.payload['index']] += round(product.score, 3)
                 else:
-                    if (k in ['product', 'sale_price', 'rating', 'brand', 'type', 'category'] and product.score > 0.5) or (k  not in ['product', 'sale_price', 'rating', 'brand', 'type', 'category']) :
+                    if (k in ['product', 'brand'] and product.score > 0.7) or (k in ['description']):
                         product_ids.append(product.payload['index'])
                         product_scores[product.payload['index']] = round(product.score, 3)
                         product_names[product.payload['index']] = product.payload['product']
@@ -51,10 +51,10 @@ def query_search(search: SearchBody):
         product_id1 = max(product_scores, key= lambda x: product_scores[x])
         ans.append({"id" : product_id1, "name" : product_names[product_id1], "score" : product_scores[product_id1]})
     if len(product_scores) > 1:
-        product_id2 = max(product_scores, key= lambda x: product_scores[x] < product_scores[product_id1])
+        product_id2 = max(product_scores, key= lambda x: product_scores[x] <= product_scores[product_id1] and x != product_id1)
         ans.append({"id" : product_id2, "name" : product_names[product_id2], "score" : product_scores[product_id2]})
     if len(product_scores) > 2:
-        product_id3 = max(product_scores, key= lambda x: product_scores[x] < product_scores[product_id2])
+        product_id3 = max(product_scores, key= lambda x: product_scores[x] <= product_scores[product_id2] and x != product_id1 and x != product_id2)
         ans.append({"id" : product_id3, "name" : product_names[product_id3], "score" : product_scores[product_id3]})
     
     return ans
